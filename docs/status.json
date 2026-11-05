@@ -1,6 +1,6 @@
 {
- "updated_at": "2026-11-05T07:28:50+00:00",
- "last_run_at": "2026-11-05T07:28:50+00:00",
+ "updated_at": "2026-11-05T07:31:18+00:00",
+ "last_run_at": "2026-11-05T07:31:18+00:00",
  "platform": "Facebook",
  "approval_mode": true,
  "pending": null,
@@ -9,6 +9,12 @@
  "images_remaining": 0,
  "tokens": [],
  "history": [
+  {
+   "at": "2026-11-05T07:31:18+00:00",
+   "ok": false,
+   "image": "-",
+   "message": "เปิดลิงก์ OneDrive ไม่ได้"
+  },
   {
    "at": "2026-11-05T07:28:50+00:00",
    "ok": false,
@@ -23,8 +29,8 @@
   }
  ],
  "error": {
-  "title": "OneDrive ไม่อนุญาตให้อ่านโฟลเดอร์",
-  "detail": "OneDrive ตอบ 401",
-  "action": "เปิดโฟลเดอร์ใน OneDrive > แชร์ > ตั้งเป็น 'ทุกคนที่มีลิงก์' สิทธิ์ 'ดูได้' แล้วคัดลอกลิงก์ใหม่ไปใส่ ONEDRIVE_SHARE_URL"
+  "title": "เปิดลิงก์ OneDrive ไม่ได้",
+  "detail": "OneDrive ตอบ 400",
+  "action": "ตรวจ ONEDRIVE_SHARE_URL ว่าเป็นลิงก์แชร์ของโฟลเดอร์ ยังไม่ถูกยกเลิกการแชร์ และเป็นบัญชีส่วนตัว"
  }
 }
