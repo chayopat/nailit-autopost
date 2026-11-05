@@ -256,11 +256,29 @@ def download_onedrive(item):
     return r.content
 
 
+# ---------- เวลาที่รูปถูกเพิ่มเข้าโฟลเดอร์ photos (จากประวัติ git) ----------
+def git_added_times():
+    times = {}
+    try:
+        out = subprocess.run(["git", "-c", "core.quotepath=off", "log", "--diff-filter=A", "--format=@@%ct", "--name-only", "--", "photos"],
+                             cwd=ROOT, capture_output=True, text=True, timeout=60).stdout
+    except Exception as exc:
+        print("[photos] อ่านประวัติ git ไม่ได้:", exc)
+        return times
+    cur = ""
+    for line in out.splitlines():
+        if line.startswith("@@"):
+            cur = f"{int(line[2:]):012d}"
+        elif line.strip():
+            times[line.strip()] = cur      # log เรียงใหม่ไปเก่า ค่าที่ทับท้ายสุดคือครั้งแรกที่เพิ่มเข้ามา
+    return times
+
+
 # ---------- เลือกรูปถัดไป ----------
 def sort_key(name, ts=""):
-    """เรียงตามเลขตัวแรกในชื่อไฟล์ (2 มาก่อน 10) ไฟล์ไม่มีเลขเรียงตามเวลาที่ใส่เข้าโฟลเดอร์ต่อท้าย"""
+    """เรียงตามเวลาที่รูปถูกใส่เข้าโฟลเดอร์ (เก่าไปใหม่) ไม่ยึดชื่อไฟล์ ถ้าเวลาเท่ากัน (ใส่พร้อมกัน) เรียงตามเลข/ชื่อ"""
     m = re.search(r"\d+", name)
-    return (0, int(m.group()), name.lower()) if m else (1, ts or "", name.lower())
+    return (ts or "", int(m.group()) if m else 0, name.lower())
 
 
 def pick(files, last_key, loop):
@@ -408,7 +426,9 @@ def prepare(state, args):
         files = [{"id": str(p), "name": p.name} for p in Path(args.local).iterdir() if p.suffix.lower() in IMG_EXT]
     elif PHOTOS.is_dir() and any(p.suffix.lower() in IMG_EXT for p in PHOTOS.iterdir()):
         svc = None
-        files = [{"id": str(p), "name": p.name, "local": True} for p in PHOTOS.iterdir() if p.suffix.lower() in IMG_EXT]
+        added = git_added_times()
+        files = [{"id": str(p), "name": p.name, "local": True, "ts": added.get("photos/" + p.name, "")}
+                 for p in PHOTOS.iterdir() if p.suffix.lower() in IMG_EXT]
         set_token(state, {"name": "รูปในโฟลเดอร์ photos (GitHub)", "expires_at": None})
     elif os.getenv("ONEDRIVE_SHARE_URL", "").strip():
         svc = None
