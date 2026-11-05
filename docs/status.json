@@ -1,13 +1,28 @@
 {
- "updated_at": "2026-11-05T07:31:18+00:00",
- "last_run_at": "2026-11-05T07:31:18+00:00",
+ "updated_at": "2026-11-05T08:07:01+00:00",
+ "last_run_at": "2026-11-05T08:07:01+00:00",
  "platform": "Facebook",
  "approval_mode": true,
- "pending": null,
- "next_image": "-",
- "images_total": 0,
- "images_remaining": 0,
- "tokens": [],
+ "pending": {
+  "image": "001.jpg",
+  "preview": "preview/img-636ee4c901.jpg",
+  "caption": "ผลงานจากร้าน Nail it! 💅\nจองคิวได้ทางแชทเลยค่ะ\n#nailit #เล็บสวย #ทำเล็บ",
+  "platforms": [
+   "facebook"
+  ],
+  "done": [],
+  "created_at": "2026-11-05T08:07:01+00:00",
+  "approved": false
+ },
+ "next_image": "001.jpg",
+ "images_total": 3,
+ "images_remaining": 3,
+ "tokens": [
+  {
+   "name": "รูปในโฟลเดอร์ photos (GitHub)",
+   "expires_at": null
+  }
+ ],
  "history": [
   {
    "at": "2026-11-05T07:31:18+00:00",
@@ -28,9 +43,5 @@
    "message": "ตั้งค่าไม่ครบ"
   }
  ],
- "error": {
-  "title": "เปิดลิงก์ OneDrive ไม่ได้",
-  "detail": "OneDrive ตอบ 400",
-  "action": "ตรวจ ONEDRIVE_SHARE_URL ว่าเป็นลิงก์แชร์ของโฟลเดอร์ ยังไม่ถูกยกเลิกการแชร์ และเป็นบัญชีส่วนตัว"
- }
+ "error": null
 }

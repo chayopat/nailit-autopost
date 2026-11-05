@@ -1,6 +1,22 @@
 {
  "last_key": null,
- "pending": null,
+ "pending": {
+  "image": "001.jpg",
+  "key": [
+   "001793865874",
+   1,
+   "001.jpg"
+  ],
+  "preview": "preview/img-636ee4c901.jpg",
+  "caption": "ผลงานจากร้าน Nail it! 💅\nจองคิวได้ทางแชทเลยค่ะ\n#nailit #เล็บสวย #ทำเล็บ",
+  "platforms": [
+   "facebook"
+  ],
+  "done": [],
+  "approved": false,
+  "created_at": "2026-11-05T08:07:01+00:00",
+  "next_image": "002.jpg"
+ },
  "history": [
   {
    "at": "2026-11-05T07:31:18+00:00",
@@ -21,6 +37,15 @@
    "message": "ตั้งค่าไม่ครบ"
   }
  ],
- "snapshot": {},
- "tokens": []
+ "snapshot": {
+  "images_total": 3,
+  "images_remaining": 3,
+  "next_image": "001.jpg"
+ },
+ "tokens": [
+  {
+   "name": "รูปในโฟลเดอร์ photos (GitHub)",
+   "expires_at": null
+  }
+ ]
 }
