@@ -41,6 +41,12 @@ def compose(photo_path, frame_path, out_path, focus=None):
     box = alpha.point(lambda v: 255 if v < 128 else 0).getbbox()
     bw, bh = box[2] - box[0], box[3] - box[1]
 
+    if photo.size == (bw, bh):        # รูปที่จัดตำแหน่งมาแล้ว (ขนาดเท่าช่องกรอบพอดี) ใช้ตามนั้น ไม่ซูม ไม่เลื่อน
+        canvas = Image.new("RGBA", frame.size, (255, 255, 255, 255))
+        canvas.paste(photo, box[:2])
+        Image.alpha_composite(canvas, frame).convert("RGB").save(out_path, quality=95)
+        return {"prefitted": True}
+
     base = max(bw / photo.width, bh / photo.height)    # cover: เต็มกรอบ ไม่บิดสัดส่วน
     band_top, band_bot = overlay_band(frame, box)     # ช่วงที่ไม่โดนโลโก้/ป้าย (พิกัดในช่อง)
     m = skin_mask(photo)
