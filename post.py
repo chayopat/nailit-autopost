@@ -17,7 +17,7 @@ from compose import compose
 
 ROOT = Path(__file__).parent
 STATE, STATUS = ROOT / "state.json", ROOT / "docs" / "status.json"
-FRAME, CAPTION = ROOT / "Review_-_2023.png", ROOT / "caption.txt"
+FRAME, CAPTION = ROOT / "nailit-frame.png", ROOT / "caption.txt"
 PREVIEW = ROOT / "docs" / "preview"
 IMG_EXT = {".jpg", ".jpeg", ".png", ".webp"}
 WARN_AT, HISTORY_MAX, HOSTED_W = {7, 3, 1, 0}, 30, 1600
