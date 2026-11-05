@@ -1,0 +1,24 @@
+{
+ "updated_at": "2026-11-05T07:24:54+00:00",
+ "last_run_at": "2026-11-05T07:24:54+00:00",
+ "platform": "Facebook",
+ "approval_mode": true,
+ "pending": null,
+ "next_image": "-",
+ "images_total": 0,
+ "images_remaining": 0,
+ "tokens": [],
+ "history": [
+  {
+   "at": "2026-11-05T07:24:54+00:00",
+   "ok": false,
+   "image": "-",
+   "message": "ตั้งค่าไม่ครบ"
+  }
+ ],
+ "error": {
+  "title": "ตั้งค่าไม่ครบ",
+  "detail": "ยังไม่ได้ตั้งค่า GOOGLE_SERVICE_ACCOUNT_JSON",
+  "action": "เพิ่ม GOOGLE_SERVICE_ACCOUNT_JSON ที่ GitHub > Settings > Secrets and variables > Actions แล้วกด Run workflow"
+ }
+}
