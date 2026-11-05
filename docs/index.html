@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>แดชบอร์ดโพสต์อัตโนมัติ Nail it!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f5f7;--surface:#fff;--ink:#16212b;--muted:#5b6b78;--line:#d9e0e6;--ok:#17794a;--ok-bg:#e3f4ea;--warn:#8a5a00;--warn-bg:#fff0cf;--err:#b3261e;--err-bg:#fde4e1;--wait:#1f4e79;--wait-bg:#e4eef8;--accent:#1f4e79;--btn-ink:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#10161c;--surface:#18212a;--ink:#e8eef3;--muted:#9aabb8;--line:#2b3844;--ok:#5fd194;--ok-bg:#12301f;--warn:#f2c35b;--warn-bg:#3a2d0c;--err:#ff8f86;--err-bg:#3d1714;--wait:#8fbbe3;--wait-bg:#14283a;--accent:#8fbbe3;--btn-ink:#10161c}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#10161c;--surface:#18212a;--ink:#e8eef3;--muted:#9aabb8;--line:#2b3844;--ok:#5fd194;--ok-bg:#12301f;--warn:#f2c35b;--warn-bg:#3a2d0c;--err:#ff8f86;--err-bg:#3d1714;--wait:#8fbbe3;--wait-bg:#14283a;--accent:#8fbbe3;--btn-ink:#10161c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;line-height:1.6}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:14px;margin-bottom:12px}
+.badges{display:flex;gap:6px;flex-wrap:wrap}.badge{border:1px solid var(--line);border-radius:999px;padding:2px 10px;background:var(--surface)}
+.hero{border-radius:14px;padding:22px;border:2px solid currentColor}
+.hero h1{margin:0 0 6px;font-size:clamp(24px,6vw,34px);line-height:1.25;font-weight:700}.hero p{margin:0;font-size:17px;color:var(--ink)}
+.hero.ok{color:var(--ok);background:var(--ok-bg)}.hero.warn{color:var(--warn);background:var(--warn-bg)}.hero.err{color:var(--err);background:var(--err-bg)}.hero.wait{color:var(--wait);background:var(--wait-bg)}
+.hero .what{margin-top:14px;padding-top:12px;border-top:1px solid currentColor;color:var(--ink);font-size:15px}
+h2{font-size:19px;margin:30px 0 8px}
+.pend{display:grid;grid-template-columns:minmax(0,320px) 1fr;gap:20px;margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.pend img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;background:var(--line);display:block}
+.pend h2{margin:0 0 6px}.cap{white-space:pre-line;margin:0 0 10px;color:var(--ink);font-size:15px;border-left:3px solid var(--line);padding-left:10px}
+.steps{list-style:none;margin:12px 0;padding:0}.steps li{display:flex;gap:10px;align-items:center;padding:3px 0;font-size:15px}
+.dot{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;border:2px solid var(--line);color:var(--muted);flex:none}
+.dot.done{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}.dot.now{background:var(--wait-bg);border-color:var(--wait);color:var(--wait)}
+.acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+button{font:inherit;font-size:15px;padding:9px 18px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--btn-ink);font-weight:500}
+button:disabled{opacity:.5;cursor:default}button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#msg{margin:10px 0 0;font-size:14px;color:var(--muted);min-height:1.5em}
+details{margin-top:10px;font-size:14px;color:var(--muted)}details input{width:100%;font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;margin:8px 0;background:var(--bg);color:var(--ink)}
+.rows{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.row{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;padding:14px 16px;border-top:1px solid var(--line)}.row:first-child{border-top:0}
+.mark{grid-row:span 2;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px;margin-top:2px}
+.mark.ok{background:var(--ok-bg);color:var(--ok)}.mark.warn{background:var(--warn-bg);color:var(--warn)}.mark.err{background:var(--err-bg);color:var(--err)}
+.row b{font-weight:500}.row .d{color:var(--muted);font-size:15px}
+.bar{height:8px;border-radius:4px;background:var(--line);margin-top:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}
+.log{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:15px}th,td{text-align:left;padding:10px 14px;border-top:1px solid var(--line);vertical-align:top}th{border-top:0;color:var(--muted);font-weight:500}
+.st{font-weight:500}.st.ok{color:var(--ok)}.st.err{color:var(--err)}
+.demo{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:28px;color:var(--muted);font-size:14px}.demo button{font-size:14px;padding:6px 14px}
+button[aria-pressed="true"]{border-color:var(--accent);outline:2px solid var(--accent)}
+@media(max-width:640px){.pend{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><span id="updated">กำลังโหลด…</span><span class="badges"><span class="badge" id="mode"></span><span class="badge" id="src"></span></span></div>
+  <section class="hero ok" id="hero" aria-live="polite"></section>
+  <section class="pend" id="pend" hidden>
+    <img id="pimg" alt="พรีวิวรูปที่จะโพสต์">
+    <div>
+      <h2>พรีวิวก่อนโพสต์</h2>
+      <p class="cap" id="pcap"></p>
+      <ol class="steps" id="steps"></ol>
+      <div class="acts"><button class="primary" id="ok">อนุมัติและโพสต์</button><button id="skip">ข้ามรูปนี้</button></div>
+      <p id="msg" role="status"></p>
+      <details id="tokbox"><summary>ตั้งค่าปุ่มอนุมัติ (ทำครั้งเดียวต่อเครื่อง)</summary>
+        <p>สร้างโทเคนที่ GitHub &gt; Settings &gt; Developer settings &gt; Fine-grained tokens เลือกเฉพาะ repo นี้ สิทธิ์ Actions: Read and write แล้ววางที่นี่ โทเคนเก็บในเครื่องนี้เท่านั้น</p>
+        <input type="password" id="tok" placeholder="github_pat_…" autocomplete="off"><button id="savetok">บันทึกโทเคน</button></details>
+    </div>
+  </section>
+  <h2>ตรวจสอบระบบ</h2><div class="rows" id="checks"></div>
+  <h2>ประวัติการรันล่าสุด</h2>
+  <div class="log"><table><thead><tr><th>เวลา</th><th>รูป</th><th>ผล</th><th>รายละเอียด</th></tr></thead><tbody id="hist"></tbody></table></div>
+  <div class="demo" id="demo"><span>ดูตัวอย่างสถานะ:</span>
+    <button data-s="pending" aria-pressed="false">รออนุมัติ</button><button data-s="ok" aria-pressed="false">ปกติ</button>
+    <button data-s="warn" aria-pressed="false">ใกล้มีปัญหา</button><button data-s="err" aria-pressed="false">มีปัญหา</button></div>
+</main>
+<script>
+(function(){
+var TZ="Asia/Bangkok",H=3600e3,D=24*H,now=Date.now(),PREVIEW="",isDemo=false,cur=null,busy=false;
+var $=function(i){return document.getElementById(i)};
+function iso(ms){return new Date(ms).toISOString()}
+function esc(x){var d=document.createElement("div");d.textContent=x==null?"":x;return d.innerHTML}
+function fmt(t){return new Date(t).toLocaleString("th-TH",{timeZone:TZ,day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}
+function days(t){return Math.ceil((new Date(t)-now)/D)}
+function demo(kind){
+  var s={updated_at:iso(now-20*60e3),last_run_at:iso(now-20*60e3),platform:"Facebook + Instagram",approval_mode:true,pending:null,
+    next_image:"043.jpg",images_total:120,images_remaining:78,
+    tokens:[{name:"Meta Page token (Facebook + Instagram)",expires_at:null},{name:"Google Drive (Service Account)",expires_at:null}],
+    history:[{at:iso(now-26*H),ok:true,image:"042.jpg",message:"โพสต์สำเร็จ: facebook, instagram"},{at:iso(now-50*H),ok:true,image:"041.jpg",message:"โพสต์สำเร็จ: facebook, instagram"},{at:iso(now-74*H),ok:true,image:"040.jpg",message:"โพสต์สำเร็จ: facebook, instagram"}],error:null};
+  if(kind==="pending")s.pending={image:"043.jpg",preview:PREVIEW,caption:"ผลงานจากร้าน Nail it! 💅\nจองคิวได้ทางแชทเลยค่ะ\n#nailit #เล็บสวย #ทำเล็บ",platforms:["facebook","instagram"],done:[],approved:false,created_at:iso(now-20*60e3)};
+  if(kind==="warn"){s.images_remaining=5;s.next_image="116.jpg";s.approval_mode=false}
+  if(kind==="ok")s.approval_mode=false;
+  if(kind==="err"){s.history.unshift({at:iso(now-2*H),ok:false,image:"043.jpg",message:"โทเคน Facebook/Instagram ใช้ไม่ได้แล้ว"});
+    s.error={title:"โพสต์ไม่สำเร็จ: โทเคน Facebook/Instagram ใช้ไม่ได้แล้ว",detail:"Meta แจ้งว่าโทเคนถูกเพิกถอน (Error 190) มักเกิดหลังเปลี่ยนรหัสผ่านหรือถอนสิทธิ์แอป",action:"สร้าง Page token ใหม่แล้วอัปเดต FB_PAGE_TOKEN ใน GitHub Secrets จากนั้นกดอนุมัติหรือ Run workflow อีกครั้ง"}}
+  return s}
+function render(s,demoMode){
+  cur=s;isDemo=demoMode;var checks=[],level="ok";
+  function bump(l){if(l==="err"||(l==="warn"&&level==="ok"))level=l}
+  var last=s.history&&s.history[0],lastOk=!last||last.ok,age=s.last_run_at?(now-new Date(s.last_run_at))/H:0,p=s.pending;
+  var postL=!lastOk?"err":(age>26?"warn":"ok");bump(postL);
+  checks.push({l:postL,t:"โพสต์ล่าสุด",d:!lastOk?"ล้มเหลวเมื่อ "+fmt(last.at)+" (รูป "+esc(last.image)+")":(age>26?"ยังไม่มีการรันใหม่เกิน 26 ชั่วโมง ตรวจสอบตัวตั้งเวลา":(last?"สำเร็จเมื่อ "+fmt(last.at)+" ลง "+esc(s.platform):"ยังไม่เคยโพสต์"))});
+  var rem=s.images_remaining||0,tot=s.images_total||0,pct=tot?Math.round(rem/tot*100):0,imgL=tot===0?"warn":(rem<=0?"err":(rem<=7?"warn":"ok"));bump(imgL);
+  checks.push({l:imgL,t:"รูปที่เหลือในโฟลเดอร์",d:(tot===0?"ยังอ่านโฟลเดอร์ไม่สำเร็จ จึงยังไม่ทราบจำนวนรูป":rem<=0?"รูปหมดแล้ว เพิ่มรูปใหม่ลงโฟลเดอร์":"เหลือ "+rem+" จาก "+tot+" รูป รูปถัดไป: "+esc(s.next_image))+'<div class="bar" role="img" aria-label="เหลือ '+pct+' เปอร์เซ็นต์"><i style="width:'+pct+'%"></i></div>'});
+  (s.tokens||[]).forEach(function(k){var l="ok",d="ไม่มีวันหมดอายุ";
+    if(k.expires_at){var n=days(k.expires_at);d="หมดอายุในอีก "+n+" วัน";if(n<=0){l="err";d="หมดอายุแล้ว"}else if(n<=10)l="warn"}
+    bump(l);checks.push({l:l,t:k.name,d:d})});
+  if(p&&level!=="err")level="wait";
+  var T={ok:["ทุกอย่างปกติ","โพสต์ล่าสุดสำเร็จ และยังไม่พบสิ่งที่ต้องแก้"],warn:["ควรเตรียมแก้ไขเร็วๆ นี้","ระบบยังทำงานอยู่ แต่มีบางอย่างใกล้ถึงขีดจำกัด"],
+    err:[s.error?s.error.title:"มีปัญหา ต้องแก้ไข","โพสต์วันนี้อาจไม่ขึ้น ควรแก้ก่อนถึงเวลาโพสต์ถัดไป"],
+    wait:["มีรูปรออนุมัติ: "+(p?p.image:""),p&&p.approved?"อนุมัติแล้ว กำลังรอระบบโพสต์ที่ยังค้างอยู่":"ดูพรีวิวด้านล่าง แล้วกดอนุมัติเพื่อโพสต์ลง "+(p?p.platforms.join(" และ "):"")]};
+  var h="<h1>"+esc(T[level][0])+"</h1><p>"+esc(s.error?s.error.detail:T[level][1])+"</p>";
+  if(s.error&&s.error.action)h+='<div class="what"><b>สิ่งที่ต้องทำ:</b> '+esc(s.error.action)+"</div>";
+  $("hero").className="hero "+level;$("hero").innerHTML=h;
+  $("pend").hidden=!p;
+  if(p){$("pimg").src=p.preview;$("pcap").textContent=p.caption||"(ไม่มีข้อความประกอบ)";$("msg").textContent="";
+    var st=[["ดึงรูปจาก Google Drive","done"],["ซ้อนกรอบ Nail it!","done"],["รออนุมัติจากคุณ",p.approved?"done":"now"]];
+    p.platforms.forEach(function(n){st.push(["โพสต์ลง "+n,p.done.indexOf(n)>=0?"done":(p.approved?"now":"todo")])});
+    $("steps").innerHTML=st.map(function(x){return '<li><span class="dot '+x[1]+'" aria-hidden="true">'+(x[1]==="done"?"✓":x[1]==="now"?"●":"")+'</span><span>'+esc(x[0])+'<span style="position:absolute;left:-9999px"> ('+(x[1]==="done"?"เสร็จแล้ว":x[1]==="now"?"กำลังรอ":"ยังไม่ถึง")+')</span></span></li>'}).join("");
+    $("ok").disabled=$("skip").disabled=false;
+    $("tokbox").style.display=isDemo?"none":"block"}
+  var sym={ok:"✓",warn:"!",err:"✕"};
+  $("checks").innerHTML=checks.map(function(c){return '<div class="row"><span class="mark '+c.l+'" aria-hidden="true">'+sym[c.l]+'</span><b>'+esc(c.t)+'</b><span class="d">'+c.d+'</span></div>'}).join("");
+  $("hist").innerHTML=(s.history&&s.history.length?s.history:[]).slice(0,10).map(function(x){return "<tr><td>"+fmt(x.at)+"</td><td>"+esc(x.image)+'</td><td class="st '+(x.ok?"ok":"err")+'">'+(x.ok?"สำเร็จ":"ล้มเหลว")+"</td><td>"+esc(x.message)+"</td></tr>"}).join("")||'<tr><td colspan="4">ยังไม่มีประวัติ</td></tr>';
+  $("updated").textContent="อัปเดตล่าสุด "+fmt(s.updated_at);
+  $("mode").textContent="โหมดอนุมัติ: "+(s.approval_mode?"เปิด":"ปิด (โพสต์อัตโนมัติ)");
+  $("src").textContent=demoMode?"ข้อมูลตัวอย่าง":"ข้อมูลจริง";
+  $("demo").style.display=demoMode?"flex":"none"}
+function msg(t){$("msg").textContent=t}
+function setDemo(k){render(demo(k),true);[].forEach.call(document.querySelectorAll("#demo button"),function(b){b.setAttribute("aria-pressed",b.dataset.s===k?"true":"false")})}
+function simulate(action){
+  if(busy)return;busy=true;$("ok").disabled=$("skip").disabled=true;
+  if(action==="skip"){msg("จำลอง: ข้ามรูปนี้ รูปถัดไปจะขึ้นแทนในรอบหน้า (ไม่ได้ทำอะไรจริง)");busy=false;return}
+  var p=cur.pending,li=$("steps").children,i=2,names=p.platforms;
+  msg("จำลอง: ส่งคำสั่งอนุมัติ…");
+  (function next(){
+    if(i>=li.length){msg("จำลองเสร็จ: ในระบบจริงรูปนี้จะขึ้นเพจแล้ว ไม่มีการโพสต์จริงจากหน้านี้");busy=false;$("ok").disabled=false;$("skip").disabled=false;return}
+    var d=li[i].querySelector(".dot");d.className="dot done";d.textContent="✓";i++;
+    if(i<li.length){var n=li[i].querySelector(".dot");if(i>2){n.className="dot now";n.textContent="●"}}
+    msg(i>3?"จำลอง: กำลังโพสต์ลง "+names[i-4]+"…":"จำลอง: อนุมัติแล้ว");setTimeout(next,900)})()}
+function repo(){var m=location.hostname.match(/^(.+)\.github\.io$/);if(!m)return null;var seg=location.pathname.split("/").filter(Boolean)[0];return{o:m[1],r:seg&&seg.indexOf(".")<0?seg:location.hostname}}
+function dispatch(action){
+  if(isDemo)return simulate(action);
+  var info=repo();if(!info){msg("ปุ่มนี้ทำงานเมื่อเปิดจากลิงก์ github.io ของโปรเจกต์");return}
+  var tok=null;try{tok=localStorage.getItem("ghTok")}catch(e){}
+  if(!tok){$("tokbox").open=true;msg("วางโทเคน GitHub ก่อน (ทำครั้งเดียว)");return}
+  msg("กำลังส่งคำสั่ง…");
+  fetch("https://api.github.com/repos/"+info.o+"/"+info.r+"/actions/workflows/post.yml/dispatches",{method:"POST",
+    headers:{"Accept":"application/vnd.github+json","Authorization":"Bearer "+tok,"X-GitHub-Api-Version":"2022-11-28"},body:JSON.stringify({ref:"main",inputs:{action:action}})})
+  .then(function(r){
+    if(r.status===204){msg("ส่งคำสั่ง"+(action==="approve"?"อนุมัติ":"ข้าม")+"แล้ว ระบบใช้เวลาราว 1-3 นาที หน้านี้จะอัปเดตเอง");poll(0)}
+    else if(r.status===401||r.status===403)msg("โทเคนไม่ถูกต้อง หรือไม่มีสิทธิ์ Actions: Read and write กับ repo นี้")
+    else if(r.status===404)msg("ไม่พบ workflow post.yml หรือโทเคนเข้าถึง repo นี้ไม่ได้")
+    else msg("ส่งคำสั่งไม่สำเร็จ (HTTP "+r.status+")")}).catch(function(){msg("เชื่อมต่อ GitHub ไม่ได้")})}
+function load(cb){fetch("status.json?"+Date.now(),{cache:"no-store"}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(j){render(j,false);cb&&cb(true)}).catch(function(){cb?cb(false):setDemo("pending")})}
+function poll(n){if(n>18)return;setTimeout(function(){var m=$("msg").textContent;load(function(){if(cur&&cur.pending)$("msg").textContent=m;if(cur&&cur.pending)poll(n+1)})},20000)}
+$("ok").addEventListener("click",function(){dispatch("approve")});$("skip").addEventListener("click",function(){dispatch("skip")});
+$("savetok").addEventListener("click",function(){var v=$("tok").value.trim();if(!v)return;try{localStorage.setItem("ghTok",v);$("tok").value="";msg("บันทึกโทเคนแล้ว กดอนุมัติได้เลย")}catch(e){msg("เบราว์เซอร์นี้เก็บโทเคนไม่ได้")}});
+[].forEach.call(document.querySelectorAll("#demo button"),function(b){b.addEventListener("click",function(){busy=false;setDemo(b.dataset.s)})});
+load();
+})();
+</script>
+</body>
+</html>
