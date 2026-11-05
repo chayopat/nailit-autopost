@@ -203,7 +203,8 @@ def list_onedrive(share_url):
             for it in j.get("value", []):
                 mime = (it.get("file") or {}).get("mimeType", "")
                 if "file" in it and (mime.startswith("image/") or Path(it["name"]).suffix.lower() in IMG_EXT):
-                    files.append({"id": it["id"], "name": it["name"], "sid": sid, "dl": it.get("@content.downloadUrl")})
+                    files.append({"id": it["id"], "name": it["name"], "sid": sid, "ts": it.get("createdDateTime", ""),
+                                  "dl": it.get("@content.downloadUrl")})
             url = j.get("@odata.nextLink")
         if ok:
             return files
@@ -219,16 +220,16 @@ def download_onedrive(item):
 
 
 # ---------- เลือกรูปถัดไป ----------
-def sort_key(name):
-    """เรียงตามเลขตัวแรกในชื่อไฟล์ (2 มาก่อน 10) ไฟล์ไม่มีเลขไปท้ายสุด"""
+def sort_key(name, ts=""):
+    """เรียงตามเลขตัวแรกในชื่อไฟล์ (2 มาก่อน 10) ไฟล์ไม่มีเลขเรียงตามเวลาที่ใส่เข้าโฟลเดอร์ต่อท้าย"""
     m = re.search(r"\d+", name)
-    return (0, int(m.group()), name.lower()) if m else (1, 0, name.lower())
+    return (0, int(m.group()), name.lower()) if m else (1, ts or "", name.lower())
 
 
 def pick(files, last_key, loop):
-    files = sorted(files, key=lambda f: sort_key(f["name"]))
+    files = sorted(files, key=lambda f: sort_key(f["name"], f.get("ts", "")))
     last = tuple(last_key) if last_key else None
-    rest = [f for f in files if last is None or sort_key(f["name"]) > last]
+    rest = [f for f in files if last is None or sort_key(f["name"], f.get("ts", "")) > last]
     if not rest and loop:
         rest = files
     return files, rest
@@ -403,7 +404,7 @@ def prepare(state, args):
     print(f"[3/3] ได้รูปพรีวิว docs/{rel} ({info})")
     if args.dry_run:
         return None
-    state["pending"] = {"image": item["name"], "key": list(sort_key(item["name"])), "preview": rel,
+    state["pending"] = {"image": item["name"], "key": list(sort_key(item["name"], item.get("ts", ""))), "preview": rel,
                         "caption": caption(), "platforms": platforms(), "done": [],
                         "approved": False, "created_at": now(),
                         "next_image": rest[1]["name"] if len(rest) > 1 else "-"}
