@@ -168,6 +168,56 @@ def download(svc, file_id):
     return buf.getvalue()
 
 
+# ---------- OneDrive (บัญชีส่วนตัว อ่านผ่านลิงก์แชร์แบบ 'ทุกคนที่มีลิงก์ดูได้') ----------
+OD_API = "https://api.onedrive.com/v1.0/shares/"
+
+
+def od_share_id(url):
+    import base64
+    return "u!" + base64.urlsafe_b64encode(url.strip().encode()).decode().rstrip("=")
+
+
+def od_error(r):
+    code = r.status_code
+    if code in (401, 403):
+        return Friendly("OneDrive ไม่อนุญาตให้อ่านโฟลเดอร์", f"OneDrive ตอบ {code}",
+                        "เปิดโฟลเดอร์ใน OneDrive > แชร์ > ตั้งเป็น 'ทุกคนที่มีลิงก์' สิทธิ์ 'ดูได้' แล้วคัดลอกลิงก์ใหม่ไปใส่ ONEDRIVE_SHARE_URL")
+    if code in (400, 404):
+        return Friendly("เปิดลิงก์ OneDrive ไม่ได้", f"OneDrive ตอบ {code}",
+                        "ตรวจ ONEDRIVE_SHARE_URL ว่าเป็นลิงก์แชร์ของโฟลเดอร์ ยังไม่ถูกยกเลิกการแชร์ และเป็นบัญชีส่วนตัว")
+    return Friendly("OneDrive ตอบกลับผิดปกติ", f"HTTP {code}",
+                    "ลองกดอนุมัติ/Run workflow ใหม่ภายหลัง ถ้ายังเป็นอีกให้ส่งข้อความนี้ให้ Claude ช่วยดู")
+
+
+def list_onedrive(share_url):
+    sid = od_share_id(share_url)
+    last = None
+    for tail in ("/root/children?$top=200", "/driveItem/children?$top=200"):
+        url, files, ok = f"{OD_API}{sid}{tail}", [], True
+        while url:
+            r = requests.get(url, timeout=30)
+            if r.status_code != 200:
+                last, ok = r, False
+                break
+            j = r.json()
+            for it in j.get("value", []):
+                mime = (it.get("file") or {}).get("mimeType", "")
+                if "file" in it and (mime.startswith("image/") or Path(it["name"]).suffix.lower() in IMG_EXT):
+                    files.append({"id": it["id"], "name": it["name"], "sid": sid, "dl": it.get("@content.downloadUrl")})
+            url = j.get("@odata.nextLink")
+        if ok:
+            return files
+    raise od_error(last)
+
+
+def download_onedrive(item):
+    url = item.get("dl") or f"{OD_API}{item['sid']}/items/{item['id']}/content"
+    r = requests.get(url, timeout=120)
+    if r.status_code != 200:
+        raise od_error(r)
+    return r.content
+
+
 # ---------- เลือกรูปถัดไป ----------
 def sort_key(name):
     """เรียงตามเลขตัวแรกในชื่อไฟล์ (2 มาก่อน 10) ไฟล์ไม่มีเลขไปท้ายสุด"""
@@ -318,6 +368,10 @@ def prepare(state, args):
     if args.local:
         svc = None
         files = [{"id": str(p), "name": p.name} for p in Path(args.local).iterdir() if p.suffix.lower() in IMG_EXT]
+    elif os.getenv("ONEDRIVE_SHARE_URL", "").strip():
+        svc = None
+        files = list_onedrive(need("ONEDRIVE_SHARE_URL"))
+        set_token(state, {"name": "OneDrive (ลิงก์แชร์)", "expires_at": None})
     else:
         svc = drive_service()
         files = list_drive(svc, need("DRIVE_FOLDER_ID"))
@@ -331,7 +385,12 @@ def prepare(state, args):
                        "เพิ่มรูปใหม่ในโฟลเดอร์ Drive โดยตั้งชื่อเลขต่อจากรูปสุดท้าย หรือตั้ง LOOP=true ให้วนกลับรูปแรก")
     item = rest[0]; CTX["image"] = item["name"]
     print(f"[2/3] รูปถัดไปคือ {item['name']} (เหลือ {len(rest)} รูปรวมรูปนี้) กำลังดาวน์โหลดและซ้อนกรอบ")
-    data = Path(item["id"]).read_bytes() if args.local else download(svc, item["id"])
+    if args.local:
+        data = Path(item["id"]).read_bytes()
+    elif item.get("sid"):
+        data = download_onedrive(item)
+    else:
+        data = download(svc, item["id"])
     PREVIEW.mkdir(parents=True, exist_ok=True)
     rel = "preview/img-" + hashlib.sha1(item["name"].encode()).hexdigest()[:10] + ".jpg"
     with tempfile.TemporaryDirectory() as td:
