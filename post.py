@@ -18,6 +18,7 @@ from compose import compose
 ROOT = Path(__file__).parent
 STATE, STATUS = ROOT / "state.json", ROOT / "docs" / "status.json"
 FRAME, CAPTION = ROOT / "nailit-frame.png", ROOT / "caption.txt"
+PHOTOS = ROOT / "photos"
 PREVIEW = ROOT / "docs" / "preview"
 IMG_EXT = {".jpg", ".jpeg", ".png", ".webp"}
 WARN_AT, HISTORY_MAX, HOSTED_W = {7, 3, 1, 0}, 30, 1600
@@ -405,6 +406,10 @@ def prepare(state, args):
     if args.local:
         svc = None
         files = [{"id": str(p), "name": p.name} for p in Path(args.local).iterdir() if p.suffix.lower() in IMG_EXT]
+    elif PHOTOS.is_dir() and any(p.suffix.lower() in IMG_EXT for p in PHOTOS.iterdir()):
+        svc = None
+        files = [{"id": str(p), "name": p.name, "local": True} for p in PHOTOS.iterdir() if p.suffix.lower() in IMG_EXT]
+        set_token(state, {"name": "รูปในโฟลเดอร์ photos (GitHub)", "expires_at": None})
     elif os.getenv("ONEDRIVE_SHARE_URL", "").strip():
         svc = None
         files = list_onedrive(need("ONEDRIVE_SHARE_URL"))
@@ -419,10 +424,10 @@ def prepare(state, args):
     snap.update(images_total=len(files), images_remaining=len(rest), next_image=rest[0]["name"] if rest else "-")
     if not rest:
         raise Friendly("รูปในโฟลเดอร์หมดแล้ว", "โพสต์ครบทุกรูปในโฟลเดอร์แล้ว",
-                       "เพิ่มรูปใหม่ในโฟลเดอร์ Drive โดยตั้งชื่อเลขต่อจากรูปสุดท้าย หรือตั้ง LOOP=true ให้วนกลับรูปแรก")
+                       "เพิ่มรูปใหม่ในโฟลเดอร์ photos บน GitHub โดยตั้งชื่อเลขต่อจากรูปสุดท้าย หรือตั้ง LOOP=true ให้วนกลับรูปแรก")
     item = rest[0]; CTX["image"] = item["name"]
     print(f"[2/3] รูปถัดไปคือ {item['name']} (เหลือ {len(rest)} รูปรวมรูปนี้) กำลังดาวน์โหลดและซ้อนกรอบ")
-    if args.local:
+    if args.local or item.get("local"):
         data = Path(item["id"]).read_bytes()
     elif item.get("sid"):
         data = download_onedrive(item)
