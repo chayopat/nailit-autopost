@@ -179,6 +179,11 @@ def od_share_id(url):
 
 def od_error(r):
     code = r.status_code
+    try:
+        body = " ".join((r.text or "")[:160].split())
+    except Exception:
+        body = ""
+    print(f"OneDrive HTTP {code}: {body}")
     if code in (401, 403):
         return Friendly("OneDrive ไม่อนุญาตให้อ่านโฟลเดอร์", f"OneDrive ตอบ {code}",
                         "เปิดโฟลเดอร์ใน OneDrive > แชร์ > ตั้งเป็น 'ทุกคนที่มีลิงก์' สิทธิ์ 'ดูได้' แล้วคัดลอกลิงก์ใหม่ไปใส่ ONEDRIVE_SHARE_URL")
@@ -189,8 +194,39 @@ def od_error(r):
                     "ลองกดอนุมัติ/Run workflow ใหม่ภายหลัง ถ้ายังเป็นอีกให้ส่งข้อความนี้ให้ Claude ช่วยดู")
 
 
+def od_candidates(share_url):
+    urls = [share_url.strip()]
+    try:
+        r = requests.get(share_url.strip(), allow_redirects=True, timeout=30, stream=True)
+        final = r.url
+        r.close()
+        if final and final not in urls:
+            urls.append(final)
+            print("[OneDrive] ลิงก์เต็ม:", final.split("?")[0])
+    except Exception as exc:
+        print("[OneDrive] แปลงลิงก์สั้นไม่ได้:", exc)
+    return urls
+
+
 def list_onedrive(share_url):
-    sid = od_share_id(share_url)
+    last = None
+    for u in od_candidates(share_url):
+        sid = od_share_id(u)
+        try:
+            return _list_onedrive_sid(sid)
+        except Friendly:
+            raise
+        except _OdFail as f:
+            last = f.resp
+    raise od_error(last)
+
+
+class _OdFail(Exception):
+    def __init__(self, resp):
+        self.resp = resp
+
+
+def _list_onedrive_sid(sid):
     last = None
     for tail in ("/root/children?$top=200", "/driveItem/children?$top=200"):
         url, files, ok = f"{OD_API}{sid}{tail}", [], True
@@ -208,7 +244,7 @@ def list_onedrive(share_url):
             url = j.get("@odata.nextLink")
         if ok:
             return files
-    raise od_error(last)
+    raise _OdFail(last)
 
 
 def download_onedrive(item):
