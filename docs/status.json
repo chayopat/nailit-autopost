@@ -1,6 +1,6 @@
 {
- "updated_at": "2026-11-05T07:24:54+00:00",
- "last_run_at": "2026-11-05T07:24:54+00:00",
+ "updated_at": "2026-11-05T07:28:50+00:00",
+ "last_run_at": "2026-11-05T07:28:50+00:00",
  "platform": "Facebook",
  "approval_mode": true,
  "pending": null,
@@ -10,6 +10,12 @@
  "tokens": [],
  "history": [
   {
+   "at": "2026-11-05T07:28:50+00:00",
+   "ok": false,
+   "image": "-",
+   "message": "OneDrive ไม่อนุญาตให้อ่านโฟลเดอร์"
+  },
+  {
    "at": "2026-11-05T07:24:54+00:00",
    "ok": false,
    "image": "-",
@@ -17,8 +23,8 @@
   }
  ],
  "error": {
-  "title": "ตั้งค่าไม่ครบ",
-  "detail": "ยังไม่ได้ตั้งค่า GOOGLE_SERVICE_ACCOUNT_JSON",
-  "action": "เพิ่ม GOOGLE_SERVICE_ACCOUNT_JSON ที่ GitHub > Settings > Secrets and variables > Actions แล้วกด Run workflow"
+  "title": "OneDrive ไม่อนุญาตให้อ่านโฟลเดอร์",
+  "detail": "OneDrive ตอบ 401",
+  "action": "เปิดโฟลเดอร์ใน OneDrive > แชร์ > ตั้งเป็น 'ทุกคนที่มีลิงก์' สิทธิ์ 'ดูได้' แล้วคัดลอกลิงก์ใหม่ไปใส่ ONEDRIVE_SHARE_URL"
  }
 }

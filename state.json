@@ -3,6 +3,12 @@
  "pending": null,
  "history": [
   {
+   "at": "2026-11-05T07:28:50+00:00",
+   "ok": false,
+   "image": "-",
+   "message": "OneDrive ไม่อนุญาตให้อ่านโฟลเดอร์"
+  },
+  {
    "at": "2026-11-05T07:24:54+00:00",
    "ok": false,
    "image": "-",
