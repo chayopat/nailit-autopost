@@ -1,0 +1,56 @@
+name: daily-post
+
+on:
+  schedule:
+    - cron: "30 4 * * *"      # 04:30 UTC = 11:30 น. เวลาไทย (GitHub อาจเริ่มช้าได้หลายนาที)
+  workflow_dispatch:           # กดรันเองได้ หรือให้แดชบอร์ดกดอนุมัติให้
+    inputs:
+      action:
+        description: "run = เตรียมรูป / approve = อนุมัติรูปที่รออยู่ / skip = ข้ามรูปที่รออยู่"
+        type: choice
+        options: [run, approve, skip]
+        default: run
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Post
+        run: python post.py ${{ inputs.action || 'run' }}
+        env:
+          DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          FB_APP_ID: ${{ secrets.FB_APP_ID }}
+          FB_APP_SECRET: ${{ secrets.FB_APP_SECRET }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          HEALTHCHECK_URL: ${{ secrets.HEALTHCHECK_URL }}
+          LOOP: ${{ vars.LOOP }}
+          APPROVAL_MODE: ${{ vars.APPROVAL_MODE }}
+          PUBLIC_BASE_URL: ${{ vars.PUBLIC_BASE_URL }}
+          PLATFORMS: ${{ vars.PLATFORMS }}
+          NOTIFY_ON_SUCCESS: ${{ vars.NOTIFY_ON_SUCCESS }}
+      - name: Save state and status
+        if: always()
+        run: |
+          git config user.name "autopost-bot"
+          git config user.email "autopost-bot@users.noreply.github.com"
+          git add -A state.json docs
+          git diff --cached --quiet || (git commit -m "update status" && git push)
